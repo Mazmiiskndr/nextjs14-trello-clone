@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+model Account {
+  id                String  @id @default(cuid()) @map("id")
+  user_id           String  @map("user_id")
+  type              String  @map("type")
+  provider          String  @map("provider")
+  provider_account_id String @map("provider_account_id")
+  refresh_token     String? @db.Text @map("refresh_token")
+  access_token      String? @db.Text @map("access_token")
+  expires_at        Int?    @map("expires_at")
+  token_type        String? @map("token_type")
+  scope             String? @map("scope")
+  id_token          String? @db.Text @map("id_token")
+  session_state     String? @map("session_state")
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([provider, provider_account_id])
+  @@map("account")
+}
+
+model Session {
+  id            String   @id @default(cuid()) @map("id")
+  session_token String   @unique @map("session_token")
+  user_id       String   @map("user_id")
+  expires       DateTime @map("expires")
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model User {
+  id             String    @id @default(cuid()) @map("id")
+  name           String?   @map("name")
+  email          String?   @unique @map("email")
+  email_verified DateTime? @map("email_verified")
+  image          String?   @map("image")
+  password       String    @map("password")
+  accounts       Account[]
+  sessions       Session[]
+
+  @@map("user")
+}
+
+model VerificationToken {
+  identifier String   @map("identifier")
+  token      String   @unique @map("token")
+  expires    DateTime @map("expires")
+
+  @@unique([identifier, token])
+  @@map("verification_token")
+}
