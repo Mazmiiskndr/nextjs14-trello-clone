@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
+import { SessionProviders } from "@/components/SessionProviders";
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +43,7 @@ export default function RootLayout({
           <div className="relative flex flex-col h-screen">
             <Navbar />
             <main className="container flex-grow px-6 pt-5 mx-auto max-w-7xl">
-              {children}
+              <SessionProviders>{children}</SessionProviders>
             </main>
             <footer className="flex items-center justify-center w-full py-3">
               <Link

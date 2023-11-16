@@ -1,4 +1,4 @@
-import { title } from "@/components/primitives";
+"use client";
 import {
   Card,
   CardHeader,
@@ -13,8 +13,28 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
+import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 
 export default function LoginPage() {
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const loginWithGoogle = async () => {
+    setIsLoading(true);
+
+    try {
+      await signIn("google");
+    } catch (error) {
+      console.log("error");
+
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  console.log(session);
+
   return (
     <Card className="max-w-md px-2 py-4 w-96" shadow="lg">
       <CardHeader className="flex-col items-center justify-center px-4 pt-2 pb-5">
@@ -35,7 +55,9 @@ export default function LoginPage() {
               <Button
                 color="default"
                 variant="bordered"
-                startContent={<FcGoogle size={20} />}
+                startContent={isLoading ? null : <FcGoogle size={20} />}
+                onClick={loginWithGoogle}
+                disabled={isLoading}
               >
                 Google
               </Button>
