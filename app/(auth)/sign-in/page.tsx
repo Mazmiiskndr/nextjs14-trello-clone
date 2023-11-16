@@ -10,7 +10,6 @@ import {
   Divider,
   Checkbox,
 } from "@nextui-org/react";
-import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
