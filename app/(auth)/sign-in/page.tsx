@@ -17,7 +17,6 @@ import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 
 export default function LoginPage() {
-  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const loginWithGoogle = async () => {
@@ -33,7 +32,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-  console.log(session);
 
   return (
     <Card className="max-w-md px-2 py-4 w-96" shadow="lg">

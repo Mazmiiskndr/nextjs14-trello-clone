@@ -9,56 +9,129 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  relationMode = "prisma"
 }
+
+enum VoteType {
+  UP
+  DOWN
+}
+
 model Account {
-  id                String  @id @default(cuid()) @map("id")
-  user_id           String  @map("user_id")
-  type              String  @map("type")
-  provider          String  @map("provider")
-  provider_account_id String @map("provider_account_id")
-  refresh_token     String? @db.Text @map("refresh_token")
-  access_token      String? @db.Text @map("access_token")
-  expires_at        Int?    @map("expires_at")
-  token_type        String? @map("token_type")
-  scope             String? @map("scope")
-  id_token          String? @db.Text @map("id_token")
-  session_state     String? @map("session_state")
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, provider_account_id])
-  @@map("account")
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id            String   @id @default(cuid()) @map("id")
-  session_token String   @unique @map("session_token")
-  user_id       String   @map("user_id")
-  expires       DateTime @map("expires")
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("session")
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id             String    @id @default(cuid()) @map("id")
-  name           String?   @map("name")
-  email          String?   @unique @map("email")
-  email_verified DateTime? @map("email_verified")
-  image          String?   @map("image")
-  password       String?    @map("password")
-  accounts       Account[]
-  sessions       Session[]
+  id                String         @id @default(cuid())
+  name              String?
+  email             String?        @unique
+  emailVerified     DateTime?
+  createdSubreddits Subreddit[]    @relation("CreatedBy")
+  subscriptions     Subscription[]
+  votes             Vote[]
+  username String? @unique
 
-  @@map("user")
+  image       String?
+  accounts    Account[]
+  sessions    Session[]
+  Post        Post[]
+  Comment     Comment[]
+  CommentVote CommentVote[]
 }
 
-model VerificationToken {
-  identifier String   @map("identifier")
-  token      String   @unique @map("token")
-  expires    DateTime @map("expires")
+model Subreddit {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
 
-  @@unique([identifier, token])
-  @@map("verification_token")
+  creatorId   String?
+  Creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  subscribers Subscription[]
+
+  @@index([name])
+}
+
+model Subscription {
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+
+  @@id([userId, subredditId])
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  subredditId String
+  comments    Comment[] 
+  votes       Vote[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+
+  replyToId String?
+  replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("ReplyTo")
+
+  votes     CommentVote[]
+  commentId String?
+}
+
+model Vote {
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  type   VoteType
+
+  @@id([userId, postId])
+}
+
+model CommentVote {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+  type      VoteType
+
+  @@id([userId, commentId])
 }

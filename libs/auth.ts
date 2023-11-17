@@ -1,86 +1,123 @@
 import { db } from "@/libs/db";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-const prisma = new PrismaClient();
-
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-  secret: process.env.NEXTAUTH_SECRET,
-  //   session: {
-  //     strategy: "jwt",
-  //   },
+  session: {
+    strategy: "jwt",
+  },
   pages: {
     signIn: "/sign-in",
   },
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
-    // async signIn({ account, profile }) {
-    //   if (account && profile && account.provider === "google") {
-    //     const existingUser = await prisma.user.findUnique({
-    //       where: { email: profile.email },
-    //     });
-    //     if (existingUser) {
-    //       console.log("User already exists", existingUser);
-    //     } else {
-    //       const newUser = await prisma.user.create({
-    //         data: {
-    //           email: profile.email,
-    //           name: profile.name,
-    //           image: profile.image,
-    //           password: "",
-    //         },
-    //       });
-    //       console.log("New user created", newUser);
-    //     }
-    //   }
-    //   return profile !== null;
-    // },
-
     async signIn({ user, account, profile }) {
-      console.log("user: ", user);
-      console.log("account: ", account);
-      console.log(profile);
+      if (account && account.provider === "google" && user.email) {
+        const userEmail = user.email;
+        let userId;
+        const userWithEmail = await db.user.findUnique({
+          where: { email: userEmail },
+        });
+
+        if (!userWithEmail) {
+          const newUser = await db.user.create({
+            data: {
+              email: userEmail,
+              name: user.name,
+              image: user.image,
+            },
+          });
+          userId = newUser.id;
+        } else {
+          userId = userWithEmail.id;
+        }
+        await db.account.upsert({
+          where: {
+            provider_providerAccountId: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          },
+          create: {
+            userId: userId,
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            access_token: account.access_token,
+            refresh_token: account.refresh_token,
+            expires_at: account.expires_at,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            session_state: account.session_state,
+          },
+          update: {
+            access_token: account.access_token,
+            refresh_token: account.refresh_token,
+            expires_at: account.expires_at,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            session_state: account.session_state,
+          },
+        });
+
+        return true;
+      }
+
       return true;
     },
 
     async session({ token, session }) {
       if (token) {
-        session.user = {
-          ...session.user,
-          id: token.id,
-          name: token.name,
-          email: token.email,
-          image: token.picture,
-          username: token.username,
-        };
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.picture;
+        session.user.username = token.username;
       }
 
       return session;
     },
 
-    async jwt({ token, account }) {
-      // Persist the OAuth access_token to the token right after signin
-      if (account) {
-        token.accessToken = account.access_token;
+    async jwt({ token, user }) {
+      const dbUser = await db.user.findFirst({
+        where: {
+          email: token.email,
+        },
+      });
+
+      if (!dbUser) {
+        token.id = user!.id;
+        return token;
       }
-      // console.log("in jwt",token)
-      return token;
+
+      if (!dbUser.username) {
+        await db.user.update({
+          where: {
+            id: dbUser.id,
+          },
+          data: {
+            username: nanoid(10),
+          },
+        });
+      }
+
+      return {
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+        picture: dbUser.image,
+        username: dbUser.username,
+      };
     },
     redirect() {
       return "/";
