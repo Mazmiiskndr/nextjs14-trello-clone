@@ -13,8 +13,11 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
-import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/auth";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
