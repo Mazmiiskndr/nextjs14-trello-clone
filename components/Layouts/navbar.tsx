@@ -8,7 +8,6 @@ import {
   NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
-
 import { link as linkStyles } from "@nextui-org/theme";
 
 import { siteConfig } from "@/config/site";
@@ -22,6 +21,8 @@ import { Logo } from "@/components/icons";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/auth";
 import { UserAccountNav } from "../UserAccountNav";
+import { Button } from "@nextui-org/button";
+import { TbExternalLink, TbLogin2 } from "react-icons/tb";
 
 export const Navbar = async () => {
   const session = await getServerSession(authOptions);
@@ -32,12 +33,12 @@ export const Navbar = async () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex items-center justify-start gap-1" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">Taskify</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="justify-start hidden gap-4 ml-2 lg:flex">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
+        {/* <ul className="justify-start hidden gap-4 ml-2 lg:flex">
+          {siteConfig.navItems.map((item, index) => (
+            <NavbarItem key={`${item.href}-${index}`}>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
@@ -50,7 +51,7 @@ export const Navbar = async () => {
               </NextLink>
             </NavbarItem>
           ))}
-        </ul>
+        </ul> */}
       </NavbarContent>
 
       <NavbarContent
@@ -58,15 +59,29 @@ export const Navbar = async () => {
         justify="end"
       >
         <NavbarItem className="hidden gap-2 sm:flex">
-          <Link isExternal href={siteConfig.links.twitter} aria-label="Twitter">
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal href={siteConfig.links.discord} aria-label="Discord">
-            <DiscordIcon className="text-default-500" />
-          </Link>
-          <Link isExternal href={siteConfig.links.github} aria-label="Github">
-            <GithubIcon className="text-default-500" />
-          </Link>
+          <Button
+            as={Link}
+            href={`/sign-in`}
+            color="default"
+            variant="solid"
+            size="sm"
+            className="flex font-semibold"
+          >
+            Sign In
+            <TbLogin2 size={20} />
+          </Button>
+          <Button
+            as={Link}
+            href="/sign-up"
+            color="primary"
+            variant="ghost"
+            size="sm"
+            className="flex items-center"
+          >
+            Get Taskify for free
+            <TbExternalLink size={20} />
+          </Button>
+
           <ThemeSwitch />
         </NavbarItem>
         {session?.user ? <UserAccountNav user={session.user} /> : null}
