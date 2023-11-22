@@ -13,68 +13,65 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
 import { z } from "zod";
-import { redirect } from "next/dist/server/api-utils";
+import { useRouter } from "next/navigation";
+import useLoading from "@/hooks/useLoading";
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+  const {
+    isLoading: isLoadingGoogle,
+    startLoading: startGoogleLoading,
+    stopLoading: stopGoogleLoading,
+  } = useLoading();
+  const {
+    isLoading: isLoadingCredentials,
+    startLoading: startCredentialsLoading,
+    stopLoading: stopCredentialsLoading,
+  } = useLoading();
+  const [formError, setFormError] = useState<string | null>(null);
 
   const loginWithGoogle = async () => {
-    setIsLoading(true);
+    startGoogleLoading();
 
     try {
       await signIn("google");
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
+      stopGoogleLoading();
     }
   };
 
-  const [formError, setFormError] = useState<string | null>(null);
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
+    startCredentialsLoading();
     setFormError(null);
 
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const values = {
+      redirect: false,
       email: formData.get("email") as string,
       password: formData.get("password") as string,
     };
 
     try {
-      const loginSchema = z.object({
-        email: z.string().email({ message: "Invalid email format" }),
-        password: z.string().min(1, { message: "Password is required" }),
-      });
-
-      // Proses login dengan credentials
-      const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        // callbackUrl: `${window.location.origin}`,
-      });
+      const result = await signIn("credentials", values);
 
       if (result?.error) {
         setFormError(result.error);
+      } else {
+        router.push("/");
       }
     } catch (error: any) {
       console.log(error);
-
-      if (error instanceof z.ZodError) {
-        const errorMessages = Object.values(error.flatten().fieldErrors)
-          .flat()
-          .join(", ");
-        setFormError(errorMessages);
-      }
+      setFormError(error);
     } finally {
-      setIsLoading(false);
+      stopCredentialsLoading();
     }
   };
 
@@ -137,14 +134,14 @@ export default function LoginPage() {
                   color="default"
                   variant="bordered"
                   startContent={
-                    isLoading ? (
+                    isLoadingGoogle ? (
                       <ImSpinner2 size={20} />
                     ) : (
                       <FcGoogle size={20} />
                     )
                   }
                   onClick={loginWithGoogle}
-                  isDisabled={isLoading}
+                  isDisabled={isLoadingGoogle}
                 >
                   Google
                 </Button>
@@ -167,7 +164,7 @@ export default function LoginPage() {
                 type="submit"
                 color="primary"
                 className="w-full mt-3"
-                isLoading={isLoading}
+                isLoading={isLoadingCredentials}
               >
                 Submit
               </Button>
