@@ -3,25 +3,34 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Image,
   Input,
   CardFooter,
   Button,
   Divider,
-  Checkbox,
 } from "@nextui-org/react";
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaSquareXTwitter } from "react-icons/fa6";
-import { FormEvent, useEffect, useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
+import { LoginFormValues } from "@/types/formType";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginValidationSchema } from "@/validations/loginValidation";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginValidationSchema),
+  });
   const router = useRouter();
   const {
     isLoading: isLoadingGoogle,
@@ -47,20 +56,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+  const onSubmit = async (values: LoginFormValues) => {
     startCredentialsLoading();
     setFormError(null);
 
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const values = {
-      redirect: false,
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-    };
-
     try {
-      const result = await signIn("credentials", values);
+      const result = await signIn("credentials", {
+        ...values,
+        redirect: false,
+      });
 
       if (result?.error) {
         setFormError(result.error);
@@ -69,10 +73,14 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.log(error);
-      setFormError(error);
+      setFormError(error.message || "Something went wrong!");
     } finally {
       stopCredentialsLoading();
     }
+  };
+
+  const handleCloseError = () => {
+    setFormError(null);
   };
 
   const pageVariants = {
@@ -109,23 +117,41 @@ export default function LoginPage() {
           <h4 className="font-bold text-center text-large">Login Form</h4>
         </CardHeader>
         <Divider />
-        <form onSubmit={handleSubmit}>
-          <CardBody className="py-5 overflow-visible gap-y-5">
-            {formError && <p className="text-red-500">{formError}</p>}
-            <Input
-              type="email"
-              name="email"
-              label="Email"
-              size="sm"
-              isRequired
-            />
-            <Input
-              type="password"
-              name="password"
-              label="Password"
-              size="sm"
-              isRequired
-            />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardBody className="py-5 overflow-visible ">
+            {formError && (
+              <div className="flex items-center w-full px-3 py-2 mb-3 text-sm bg-[#f8d7da] rounded-lg justify-between">
+                <p className="text-[#721c24] font-medium">{formError}</p>
+                <FaTimes
+                  className="text-[#721c24] cursor-pointer"
+                  onClick={handleCloseError}
+                />
+              </div>
+            )}
+            <div className="flex flex-col items-start">
+              <Input
+                type="text"
+                label="Email"
+                size="sm"
+                variant="bordered"
+                isRequired
+                isInvalid={!!errors.email}
+                errorMessage={errors.email?.message}
+                {...register("email")}
+              />
+            </div>
+            <div className="flex flex-col items-start mt-5">
+              <Input
+                type="password"
+                variant="bordered"
+                {...register("password")}
+                label="Password"
+                size="sm"
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message}
+                isRequired
+              />
+            </div>
           </CardBody>
           <CardFooter>
             <div className="flex flex-col w-full gap-y-3">
@@ -163,10 +189,12 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 color="primary"
-                className="w-full mt-3"
+                className={`w-full mt-3 ${
+                  isLoadingCredentials ? "cursor-progress" : ""
+                }`}
                 isLoading={isLoadingCredentials}
               >
-                Submit
+                Sign In
               </Button>
             </div>
           </CardFooter>

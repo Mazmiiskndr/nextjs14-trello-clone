@@ -59,17 +59,20 @@ export const Navbar = async () => {
         justify="end"
       >
         <NavbarItem className="hidden gap-2 sm:flex">
-          <Button
-            as={Link}
-            href={`/sign-in`}
-            color="default"
-            variant="solid"
-            size="sm"
-            className="flex font-semibold"
-          >
-            Sign In
-            <TbLogin2 size={20} />
-          </Button>
+          {!session?.user ? (
+            <Button
+              as={Link}
+              href={`/sign-in`}
+              color="default"
+              variant="solid"
+              size="sm"
+              className="flex font-semibold"
+            >
+              Sign In
+              <TbLogin2 size={20} />
+            </Button>
+          ) : null}
+
           <Button
             as={Link}
             href="/sign-up"
