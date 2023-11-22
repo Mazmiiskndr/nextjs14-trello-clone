@@ -54,6 +54,8 @@ model User {
   votes             Vote[]
   username String? @unique
 
+  password       String?
+  hashedPassword       String?
   image       String?
   accounts    Account[]
   sessions    Session[]

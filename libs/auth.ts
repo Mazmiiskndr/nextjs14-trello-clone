@@ -3,6 +3,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { nanoid } from "nanoid";
 import { NextAuthOptions, getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -16,6 +18,37 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "text", placeholder: "Email" },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "Password",
+        },
+      },
+      // TODO:
+      authorize: async (credentials) => {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Please enter your email and password");
+        }
+        const user = await db.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !user?.hashedPassword) {
+          throw new Error(user?.email + " is not registered");
+        }
+        // const isCorrectPassword = await bcrypt.compare(
+        //   credentials.password,
+        //   user.hashedPassword
+        // );
+
+        // if (!isCorrectPassword) throw new Error("Invalid email or password");
+        return user;
+      },
     }),
   ],
   callbacks: {
@@ -119,8 +152,10 @@ export const authOptions: NextAuthOptions = {
         username: dbUser.username,
       };
     },
-    redirect() {
-      return "/";
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
 };

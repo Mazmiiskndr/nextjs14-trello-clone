@@ -14,15 +14,17 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
   return (
     <NavbarItem className="hidden md:flex">
       <Button
-        className="text-sm font-normal text-default-600 bg-default-100"
+        color="default"
+        className="flex font-semibold"
         onClick={(event) => {
           event.preventDefault();
           signOut({
             callbackUrl: `${window.location.origin}/sign-in`,
           });
         }}
-        startContent={<TbLogout className="text-danger" />}
-        variant="flat"
+        endContent={<TbLogout className="text-danger" size={20} />}
+        variant="solid"
+        size="sm"
       >
         Sign Out
       </Button>
