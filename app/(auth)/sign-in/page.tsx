@@ -72,7 +72,6 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (error: any) {
-      console.log(error);
       setFormError(error.message || "Something went wrong!");
     } finally {
       stopCredentialsLoading();
