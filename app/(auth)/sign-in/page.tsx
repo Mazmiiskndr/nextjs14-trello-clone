@@ -7,6 +7,7 @@ import {
   CardFooter,
   Button,
   Divider,
+  Link,
 } from "@nextui-org/react";
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
@@ -23,7 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidationSchema } from "@/validations/loginValidation";
 import { useForm } from "react-hook-form";
 
-export default function LoginPage() {
+export default function SignInPage() {
   const {
     register,
     handleSubmit,
@@ -184,13 +185,20 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 color="primary"
-                className={`w-full mt-3 ${
+                className={`w-full mt-3 mb-3 ${
                   isLoadingCredentials ? "cursor-progress" : ""
                 }`}
                 isLoading={isLoadingCredentials}
               >
                 Sign In
               </Button>
+              <Divider />
+              <div className="flex items-center justify-center gap-x-1">
+                <span className="text-sm">Don&apos;t Have an Account?</span>
+                <Link href="/sign-up" className="text-sm hover:underline">
+                  Register
+                </Link>
+              </div>
             </div>
           </CardFooter>
         </form>

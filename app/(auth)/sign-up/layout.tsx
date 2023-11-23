@@ -6,11 +6,11 @@ import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: {
-    default: "Sign In",
-    template: `%s - Sign In`,
+    default: "Sign Up",
+    template: `%s - Sign Up`,
   },
   description:
-    "Access your account quickly and securely on our Sign In. Offering Google, GitHub, and Twitter authentication options, we ensure a seamless and protected sign-in experience. Sign in now to explore our exclusive features and services.",
+    "Access your account quickly and securely on our Sign Up. Offering Google, GitHub, and Twitter authentication options, we ensure a seamless and protected sign-in experience. Sign in now to explore our exclusive features and services.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-const SignInLayout = ({ children }: { children: React.ReactNode }) => {
+const SignUpLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense fallback={<Loading />}>
       <div className="relative flex flex-col h-screen">
@@ -42,4 +42,4 @@ const SignInLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default SignInLayout;
+export default SignUpLayout;
