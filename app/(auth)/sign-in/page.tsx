@@ -66,11 +66,7 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      if (result?.error) {
-        setFormError(result.error);
-      } else {
-        router.push("/");
-      }
+      result?.error ? setFormError(result.error) : router.push("/");
     } catch (error: any) {
       setFormError(error.message || "Something went wrong!");
     } finally {
