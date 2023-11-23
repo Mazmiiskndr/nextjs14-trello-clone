@@ -34,7 +34,7 @@ const LoginLayout = ({ children }: { children: React.ReactNode }) => {
             title="nextui.org homepage"
           >
             <span className="text-default-600">Powered by</span>
-            <p className="text-primary">NextUI</p>
+            <p className="text-primary">Mazmiiskndr</p>
           </Link>
         </footer>
       </div>

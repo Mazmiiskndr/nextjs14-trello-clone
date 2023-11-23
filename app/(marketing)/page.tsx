@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@nextui-org/button";
 import clsx from "clsx";
 import { Medal } from "lucide-react";
@@ -6,6 +7,7 @@ import React from "react";
 import { TbExternalLink } from "react-icons/tb";
 import localFont from "next/font/local";
 import { Poppins } from "next/font/google";
+import { motion } from "framer-motion";
 
 const headingFont = localFont({
   src: "../../public/fonts/font.woff2",
@@ -17,8 +19,31 @@ const textFont = Poppins({
 });
 
 export default function MarketingPage() {
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+    },
+    in: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+      },
+    },
+    out: {
+      opacity: 0,
+      transition: {
+        duration: 0.8,
+      },
+    },
+  };
   return (
-    <div className="flex flex-col items-center justify-center">
+    <motion.div
+      className="flex flex-col items-center justify-center"
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+    >
       <div
         className={clsx(
           "flex flex-col items-center justify-center",
@@ -52,6 +77,6 @@ export default function MarketingPage() {
         Get Taskify for free
         <TbExternalLink size={20} />
       </Button>
-    </div>
+    </motion.div>
   );
 }
