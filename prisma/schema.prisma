@@ -51,8 +51,6 @@ model User {
   createdSubreddits Subreddit[]    @relation("CreatedBy")
   subscriptions     Subscription[]
   votes             Vote[]
-  username String? @unique
-
   password       String?
   hashedPassword       String?
   image       String?

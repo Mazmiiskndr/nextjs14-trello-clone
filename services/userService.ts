@@ -23,6 +23,7 @@ export const createUser = async (userData: UserRegistrationData) => {
     data: {
       email,
       hashedPassword,
+      password,
       name,
     },
   });

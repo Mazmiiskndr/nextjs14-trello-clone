@@ -9,9 +9,78 @@ import {
   Divider,
   Link,
 } from "@nextui-org/react";
+import { SignUpFormValues } from "@/types/formTypes";
+import { signUpValidationSchema } from "@/validations/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import useLoading from "@/hooks/useLoading";
+import { useState } from "react";
+import { createUser } from "@/services/userService";
+import { FaTimes } from "react-icons/fa";
 
 const SignUpPage = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpValidationSchema),
+  });
+  const {
+    isLoading: isLoading,
+    startLoading: startLoading,
+    stopLoading: stopLoading,
+  } = useLoading();
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const onSubmit = async (values: SignUpFormValues) => {
+    startLoading();
+    setFormError(null);
+
+    try {
+      // TODO:
+      // const newUser = await createUser({
+      //   email: values.email,
+      //   password: values.password,
+      //   name: values.name,
+      // });
+      const response = await fetch("/api/users/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          name: values.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      console.log("User created successfully", responseData);
+      reset();
+      // Misal redirect ke halaman login atau home
+      // router.push('/sign-in');
+    } catch (error) {
+      if (error instanceof Error) {
+        setFormError(error.message);
+      } else {
+        setFormError("An unexpected error occurred");
+      }
+    } finally {
+      stopLoading();
+    }
+  };
+  const handleCloseError = () => {
+    setFormError(null);
+  };
+
   const pageVariants = {
     initial: {
       opacity: 0,
@@ -29,6 +98,7 @@ const SignUpPage = () => {
       },
     },
   };
+
   return (
     <motion.div
       className="flex items-center justify-center"
@@ -45,9 +115,9 @@ const SignUpPage = () => {
           <h4 className="font-bold text-center text-large">Sign Up Form</h4>
         </CardHeader>
         <Divider />
-        <form className="w-full">
+        <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
           <CardBody className="w-full py-5 overflow-visible">
-            {/* {formError && (
+            {formError && (
               <div className="flex items-center w-full px-3 py-2 mb-3 text-sm bg-[#f8d7da] rounded-lg justify-between">
                 <p className="text-[#721c24] font-medium">{formError}</p>
                 <FaTimes
@@ -55,7 +125,7 @@ const SignUpPage = () => {
                   onClick={handleCloseError}
                 />
               </div>
-            )} */}
+            )}
             <div className="flex flex-col items-start">
               <Input
                 type="text"
@@ -64,9 +134,9 @@ const SignUpPage = () => {
                 variant="bordered"
                 isRequired
                 fullWidth={true}
-                // isInvalid={!!errors.email}
-                // errorMessage={errors.email?.message}
-                // {...register("email")}
+                isInvalid={!!errors.name}
+                errorMessage={errors.name?.message}
+                {...register("name")}
               />
             </div>
             <div className="flex flex-col items-start mt-5">
@@ -77,9 +147,9 @@ const SignUpPage = () => {
                 variant="bordered"
                 isRequired
                 fullWidth={true}
-                // isInvalid={!!errors.email}
-                // errorMessage={errors.email?.message}
-                // {...register("email")}
+                isInvalid={!!errors.email}
+                errorMessage={errors.email?.message}
+                {...register("email")}
               />
             </div>
             <div className="flex flex-col items-start mt-5">
@@ -90,9 +160,9 @@ const SignUpPage = () => {
                 size="sm"
                 isRequired
                 fullWidth={true}
-                // {...register("password")}
-                // isInvalid={!!errors.password}
-                // errorMessage={errors.password?.message}
+                {...register("password")}
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message}
               />
             </div>
             <div className="flex flex-col items-start mt-5">
@@ -103,9 +173,9 @@ const SignUpPage = () => {
                 size="sm"
                 isRequired
                 fullWidth={true}
-                // {...register("password")}
-                // isInvalid={!!errors.password}
-                // errorMessage={errors.password?.message}
+                {...register("confirmPassword")}
+                isInvalid={!!errors.confirmPassword}
+                errorMessage={errors.confirmPassword?.message}
               />
             </div>
           </CardBody>
@@ -115,7 +185,7 @@ const SignUpPage = () => {
                 type="submit"
                 color="primary"
                 className={`w-full  mb-3`}
-                isLoading={false}
+                isLoading={isLoading}
               >
                 Register
               </Button>

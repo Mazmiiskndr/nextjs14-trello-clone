@@ -42,12 +42,12 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user?.hashedPassword) {
           throw new Error(user?.email + " is not registered");
         }
-        // const isCorrectPassword = await bcrypt.compare(
-        //   credentials.password,
-        //   user.hashedPassword
-        // );
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
 
-        // if (!isCorrectPassword) throw new Error("Invalid email or password");
+        if (!isCorrectPassword) throw new Error("Invalid email or password");
         return user;
       },
     }),
