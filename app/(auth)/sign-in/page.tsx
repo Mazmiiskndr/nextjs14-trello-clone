@@ -19,9 +19,9 @@ import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
-import { LoginFormValues } from "@/types/formType";
+import { SignInFormValues } from "@/types/formTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginValidationSchema } from "@/validations/loginValidation";
+import { signInValidationSchema } from "@/validations/authValidation";
 import { useForm } from "react-hook-form";
 
 export default function SignInPage() {
@@ -29,8 +29,8 @@ export default function SignInPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginValidationSchema),
+  } = useForm<SignInFormValues>({
+    resolver: zodResolver(signInValidationSchema),
   });
   const router = useRouter();
   const {
@@ -57,7 +57,7 @@ export default function SignInPage() {
     }
   };
 
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (values: SignInFormValues) => {
     startCredentialsLoading();
     setFormError(null);
 
@@ -110,10 +110,10 @@ export default function SignInPage() {
         shadow="lg"
       >
         <CardHeader className="flex-col items-center justify-center px-4 pt-2 pb-5">
-          <h4 className="font-bold text-center text-large">Login Form</h4>
+          <h4 className="font-bold text-center text-large">Sign In Form</h4>
         </CardHeader>
         <Divider />
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <CardBody className="py-5 overflow-visible ">
             {formError && (
               <div className="flex items-center w-full px-3 py-2 mb-3 text-sm bg-[#f8d7da] rounded-lg justify-between">
@@ -126,7 +126,7 @@ export default function SignInPage() {
             )}
             <div className="flex flex-col items-start">
               <Input
-                type="text"
+                type="email"
                 label="Email"
                 size="sm"
                 variant="bordered"
