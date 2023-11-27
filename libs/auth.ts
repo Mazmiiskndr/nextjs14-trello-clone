@@ -34,21 +34,29 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Please enter your email and password");
         }
-        const user = await db.user.findUnique({
-          where: { email: credentials.email },
-        });
-        console.log(user);
 
-        if (!user || !user?.hashedPassword) {
-          throw new Error(user?.email + " is not registered");
+        try {
+          const user = await db.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user || user.password === null) {
+            throw new Error(`${credentials.email} is not registered`);
+          }
+
+          const isCorrectPassword = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isCorrectPassword) {
+            throw new Error("Invalid email or password");
+          }
+
+          return { ...user, password: undefined };
+        } catch (error: any) {
+          throw new Error(error.message);
         }
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-
-        if (!isCorrectPassword) throw new Error("Invalid email or password");
-        return user;
       },
     }),
   ],

@@ -16,8 +16,8 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import useLoading from "@/hooks/useLoading";
 import { useState } from "react";
-import { createUser } from "@/services/userService";
 import { FaTimes } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const SignUpPage = () => {
   const {
@@ -33,6 +33,7 @@ const SignUpPage = () => {
     startLoading: startLoading,
     stopLoading: stopLoading,
   } = useLoading();
+  const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
 
   const onSubmit = async (values: SignUpFormValues) => {
@@ -40,12 +41,6 @@ const SignUpPage = () => {
     setFormError(null);
 
     try {
-      // TODO:
-      // const newUser = await createUser({
-      //   email: values.email,
-      //   password: values.password,
-      //   name: values.name,
-      // });
       const response = await fetch("/api/users/create", {
         method: "POST",
         headers: {
@@ -65,8 +60,7 @@ const SignUpPage = () => {
       const responseData = await response.json();
       console.log("User created successfully", responseData);
       reset();
-      // Misal redirect ke halaman login atau home
-      // router.push('/sign-in');
+      router.push("/sign-in");
     } catch (error) {
       if (error instanceof Error) {
         setFormError(error.message);
@@ -131,6 +125,7 @@ const SignUpPage = () => {
                 type="text"
                 label="Name"
                 size="sm"
+                autoFocus={true}
                 variant="bordered"
                 isRequired
                 fullWidth={true}

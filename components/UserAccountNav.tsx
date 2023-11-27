@@ -18,8 +18,6 @@ interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
-  console.log(user);
-
   return (
     <NavbarItem className="hidden md:flex">
       <div className="flex flex-row items-center gap-x-2">
@@ -29,7 +27,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
               isBordered
               size="sm"
               radius="lg"
-              src={user?.image as string}
+              src={(user?.image as string) || ""}
               className="transition-all duration-200 ease-in-out cursor-pointer hover:scale-95"
             />
           </DropdownTrigger>

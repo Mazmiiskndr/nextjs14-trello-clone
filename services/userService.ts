@@ -2,6 +2,7 @@
 
 import { db } from "@/libs/db";
 import bcrypt from "bcrypt";
+import { nanoid } from "nanoid";
 
 interface UserRegistrationData {
   email: string;
@@ -18,12 +19,13 @@ export const createUser = async (userData: UserRegistrationData) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const username = nanoid(10);
 
   const user = await db.user.create({
     data: {
       email,
-      hashedPassword,
-      password,
+      username,
+      password: hashedPassword,
       name,
     },
   });
