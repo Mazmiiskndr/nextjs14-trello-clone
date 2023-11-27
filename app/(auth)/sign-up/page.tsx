@@ -54,7 +54,8 @@ const SignUpPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || response.statusText);
       }
 
       const responseData = await response.json();

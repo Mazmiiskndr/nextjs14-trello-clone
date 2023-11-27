@@ -196,7 +196,7 @@ export default function SignInPage() {
               <div className="flex items-center justify-center gap-x-1">
                 <span className="text-sm">Don&apos;t Have an Account?</span>
                 <Link href="/sign-up" className="text-sm hover:underline">
-                  Register
+                  Sign Up
                 </Link>
               </div>
             </div>
