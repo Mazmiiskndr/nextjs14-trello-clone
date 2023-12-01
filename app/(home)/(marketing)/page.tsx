@@ -10,7 +10,7 @@ import { Poppins } from "next/font/google";
 import { motion } from "framer-motion";
 
 const headingFont = localFont({
-  src: "../../public/fonts/font.woff2",
+  src: "../../../public/fonts/font.woff2",
 });
 
 const textFont = Poppins({

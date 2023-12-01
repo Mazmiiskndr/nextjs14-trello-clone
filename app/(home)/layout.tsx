@@ -4,20 +4,6 @@ import { Link } from "@nextui-org/link";
 import { Metadata } from "next";
 import React, { Suspense } from "react";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Sign Up",
-    template: `%s - Sign Up`,
-  },
-  description:
-    "Access your account quickly and securely on our Sign Up. Offering Google, GitHub, and Twitter authentication options, we ensure a seamless and protected sign-in experience. Sign in now to explore our exclusive features and services.",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
-  },
-};
-
 const SignUpLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense fallback={<Loading />}>
