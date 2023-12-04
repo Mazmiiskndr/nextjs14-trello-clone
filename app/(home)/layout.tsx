@@ -7,7 +7,7 @@ import React, { Suspense } from "react";
 const SignUpLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense fallback={<Loading />}>
-      <div className="relative flex flex-col h-screen">
+      <div className="relative flex flex-col min-h-screen bg-slate-100 dark:bg-slate-950">
         <Navbar />
 
         <main className="flex-grow w-full pt-10">{children}</main>

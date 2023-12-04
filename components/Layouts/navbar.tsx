@@ -28,7 +28,12 @@ export const Navbar = async () => {
   const session = await getServerSession(authOptions);
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" isBordered>
+    <NextUINavbar
+      maxWidth="xl"
+      position="sticky"
+      isBordered
+      className="drop-shadow-sm"
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex items-center justify-start gap-1" href="/">
@@ -36,29 +41,13 @@ export const Navbar = async () => {
             <p className="font-bold text-inherit">Taskify</p>
           </NextLink>
         </NavbarBrand>
-        {/* <ul className="justify-start hidden gap-4 ml-2 lg:flex">
-          {siteConfig.navItems.map((item, index) => (
-            <NavbarItem key={`${item.href}-${index}`}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul> */}
       </NavbarContent>
 
       <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
+        className="flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden gap-2 sm:flex">
+        <NavbarItem className="flex gap-2">
           {!session?.user ? (
             <Button
               as={Link}
@@ -79,46 +68,21 @@ export const Navbar = async () => {
             color="primary"
             variant="ghost"
             size="sm"
-            className="flex items-center"
+            className="items-center hidden sm:flex "
           >
             Get Taskify for free
             <TbExternalLink size={20} />
           </Button>
 
-          <ThemeSwitch />
+          <ThemeSwitch  />
         </NavbarItem>
         {session?.user ? <UserAccountNav user={session.user} /> : null}
       </NavbarContent>
 
-      <NavbarContent className="pl-4 sm:hidden basis-1" justify="end">
-        <Link isExternal href={siteConfig.links.github} aria-label="Github">
-          <GithubIcon className="text-default-500" />
-        </Link>
+      {/* <NavbarContent className="pl-4 sm:hidden basis-1" justify="end">
+        
         <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        <div className="flex flex-col gap-2 mx-4 mt-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                    ? "danger"
-                    : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
+      </NavbarContent> */}
     </NextUINavbar>
   );
 };
