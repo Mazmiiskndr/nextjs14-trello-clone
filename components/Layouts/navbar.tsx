@@ -15,7 +15,7 @@ import { TbExternalLink, TbLogin2 } from "react-icons/tb";
 import { useSession } from "next-auth/react";
 
 export const Navbar =  () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   return (
     <NextUINavbar
       maxWidth="xl"
