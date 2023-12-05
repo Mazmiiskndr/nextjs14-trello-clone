@@ -10,7 +10,7 @@ const SignUpLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="relative flex flex-col min-h-screen bg-slate-100 dark:bg-slate-950">
         <Navbar />
 
-        <main className="flex-grow w-full pt-10">{children}</main>
+        <main className="flex-grow w-full pt-20">{children}</main>
 
         <footer className="flex items-center justify-center w-full py-3">
           <Link

@@ -18,6 +18,7 @@ import useLoading from "@/hooks/useLoading";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { createUserAction } from "@/actions/UserActions";
 
 const SignUpPage = () => {
   const {
@@ -27,6 +28,7 @@ const SignUpPage = () => {
     formState: { errors },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpValidationSchema),
+    mode: "onChange",
   });
   const {
     isLoading: isLoading,
@@ -41,25 +43,18 @@ const SignUpPage = () => {
     setFormError(null);
 
     try {
-      const response = await fetch("/api/users/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-          name: values.name,
-        }),
-      });
+      const formData = new FormData();
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("name", values.name);
 
-      if (!response.ok) {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.error || response.statusText);
+      const actionResponse = await createUserAction(formData);
+
+      if (actionResponse.error) {
+        throw new Error(actionResponse.error);
       }
 
-      const responseData = await response.json();
-      console.log("User created successfully", responseData);
+      console.log("User created successfully", actionResponse.user);
       reset();
       router.push("/sign-in");
     } catch (error) {
@@ -72,6 +67,7 @@ const SignUpPage = () => {
       stopLoading();
     }
   };
+
   const handleCloseError = () => {
     setFormError(null);
   };

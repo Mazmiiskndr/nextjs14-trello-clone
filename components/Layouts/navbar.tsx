@@ -1,32 +1,21 @@
+'use client'
 import {
   Navbar as NextUINavbar,
   NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
-import { link as linkStyles } from "@nextui-org/theme";
-
-import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
-import clsx from "clsx";
-
 import { ThemeSwitch } from "@/components/theme-switch";
-import { TwitterIcon, GithubIcon, DiscordIcon } from "@/components/icons";
-
 import { Logo } from "@/components/icons";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/libs/auth";
 import { UserAccountNav } from "../UserAccountNav";
 import { Button } from "@nextui-org/button";
 import { TbExternalLink, TbLogin2 } from "react-icons/tb";
+import { useSession } from "next-auth/react";
 
-export const Navbar = async () => {
-  const session = await getServerSession(authOptions);
-
+export const Navbar =  () => {
+  const { data: session, status } = useSession();
   return (
     <NextUINavbar
       maxWidth="xl"
@@ -47,7 +36,7 @@ export const Navbar = async () => {
         className="flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="flex gap-2">
+        <NavbarItem className="flex gap-2" >
           {!session?.user ? (
             <Button
               as={Link}
@@ -78,11 +67,6 @@ export const Navbar = async () => {
         </NavbarItem>
         {session?.user ? <UserAccountNav user={session.user} /> : null}
       </NavbarContent>
-
-      {/* <NavbarContent className="pl-4 sm:hidden basis-1" justify="end">
-        
-        <ThemeSwitch />
-      </NavbarContent> */}
     </NextUINavbar>
   );
 };

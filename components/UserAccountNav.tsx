@@ -33,19 +33,30 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           </DropdownTrigger>
           <DropdownMenu aria-label="Static Actions">
             <DropdownSection title="Actions" showDivider>
-              <DropdownItem key="profile" className="gap-2 h-14">
+              <DropdownItem
+                key="profile"
+                className="gap-2 h-14"
+                textValue="Sign In as"
+              >
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{user?.email}</p>
               </DropdownItem>
-              <DropdownItem key="new">Profile</DropdownItem>
-              <DropdownItem key="copy">Forgot Password</DropdownItem>
-              <DropdownItem key="edit">Change Password</DropdownItem>
+              <DropdownItem key="new" textValue="Profile">
+                Profile
+              </DropdownItem>
+              <DropdownItem key="copy" textValue="Forgot Password">
+                Forgot Password
+              </DropdownItem>
+              <DropdownItem key="edit" textValue="Change Password">
+                Change Password
+              </DropdownItem>
             </DropdownSection>
             <DropdownSection>
               <DropdownItem
                 key="sign-out"
                 className="text-danger"
                 color="danger"
+                textValue="Sign Out"
                 onClick={(event) => {
                   event.preventDefault();
                   signOut({
